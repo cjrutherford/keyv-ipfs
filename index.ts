@@ -5,7 +5,7 @@ import * as fs from 'fs-extra'
 import Debug from 'debug'
 import * as IPFS from 'ipfs';
 
-const debug = Debug('keyv-file')
+const debug = Debug('keyv-ipfs')
 
 function isNumber(val: any): val is number {
   return typeof val === 'number'
@@ -22,7 +22,7 @@ export const defaultOpts = {
   encode: JSON.stringify as any as (val: any) => any,
   decode: JSON.parse as any as (val: any) => any,
 }
-export function makeField<T = any>(kv: KeyvFile, key: string, defaults?: T) {
+export function makeField<T = any>(kv: KeyvIpfs, key: string, defaults?: T) {
   return {
     get(def = defaults) {
       return kv.get(key, def)
@@ -35,7 +35,7 @@ export function makeField<T = any>(kv: KeyvFile, key: string, defaults?: T) {
     },
   }
 }
-export class KeyvFile<V = any> {
+export class KeyvIpfs<V = any> {
   ttlSupport = true
   private _opts = defaultOpts
   private _cache: Map<string, Data<V>>
@@ -190,6 +190,6 @@ export class KeyvFile<V = any> {
     return this._savePromise
   }
 }
-export default KeyvFile
-module.exports = KeyvFile
-module.exports.default = KeyvFile
+export default KeyvIpfs
+module.exports = KeyvIpfs
+module.exports.default = KeyvIpfs
