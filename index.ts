@@ -3,6 +3,7 @@
 import * as os from 'os'
 import * as fs from 'fs-extra'
 import Debug from 'debug'
+import * as IPFS from 'ipfs';
 
 const debug = Debug('keyv-file')
 
@@ -15,7 +16,7 @@ export interface Data<V> {
 }
 
 export const defaultOpts = {
-  filename: `${os.tmpdir()}/keyv-file/default-rnd-${Math.random().toString(36).slice(2)}.json`,
+  filename: `${os.tmpdir()}/keyv-ipfs/default-rnd-${Math.random().toString(36).slice(2)}.json`,
   expiredCheckDelay: 24 * 3600 * 1000, // ms
   writeDelay: 100, // ms
   encode: JSON.stringify as any as (val: any) => any,
@@ -40,12 +41,14 @@ export class KeyvFile<V = any> {
   private _cache: Map<string, Data<V>>
   private _lastExpire: number
   private _saveTimer?: NodeJS.Timer
+  private _ipfs: IPFS
 
-  constructor(opts?: Partial<typeof defaultOpts>) {
+  constructor(ipfs: any, opts?: Partial<typeof defaultOpts>) {
     this._opts = {
       ...this._opts,
       ...opts,
     }
+    this._ipfs = ipfs
     try {
       const data = this._opts.decode(fs.readFileSync(this._opts.filename, 'utf8'))
       if (!Array.isArray(data.cache)) {
@@ -68,9 +71,9 @@ export class KeyvFile<V = any> {
     return isNumber(data.expire) && data.expire <= Date.now()
   }
 
-  get<T=V>(key: string, defaults: T): T
-  get<T=V>(key: string): T | undefined
-  get<T=V>(key: string, defaults?: T): T | undefined {
+  get<T = V>(key: string, defaults: T): T
+  get<T = V>(key: string): T | undefined
+  get<T = V>(key: string, defaults?: T): T | undefined {
     try {
       const data = this._cache.get(key)
       if (!data) {
@@ -154,13 +157,16 @@ export class KeyvFile<V = any> {
       lastExpire: this._lastExpire,
     })
     return new Promise<void>((resolve, reject) => {
-      fs.outputFile(this._opts.filename, data, err => {
-        if (err) {
-          reject(err)
-        } else {
-          resolve()
-        }
-      })
+      this._ipfs.files.write(this._opts.filename, data).then((res:any) => {
+        resolve();
+      }).catch((err: Error) => reject(err));
+      // fs.outputFile(this._opts.filename, data, err => {
+      //   if (err) {
+      //     reject(err)
+      //   } else {
+      //     resolve()
+      //   }
+      // })
     })
   }
   private _savePromise?: Promise<any>
