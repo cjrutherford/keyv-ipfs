@@ -16,7 +16,7 @@ export interface Data<V> {
 }
 
 export const defaultOpts = {
-  filename: `${os.tmpdir()}/keyv-ipfs/default-rnd-${Math.random().toString(36).slice(2)}.json`,
+  filename: `/keyv-ipfs/default-rnd-${Math.random().toString(36).slice(2)}.json`,
   expiredCheckDelay: 24 * 3600 * 1000, // ms
   writeDelay: 100, // ms
   encode: JSON.stringify as any as (val: any) => any,
@@ -50,16 +50,18 @@ export class KeyvFile<V = any> {
     }
     this._ipfs = ipfs
     try {
-      const data = this._opts.decode(fs.readFileSync(this._opts.filename, 'utf8'))
-      if (!Array.isArray(data.cache)) {
-        const _cache = data.cache
-        data.cache = []
-        for (const key in _cache) {
-          data.cache.push([key, _cache[key]])
+      this._ipfs.files.read(this._opts.filename).then((res: any) => {
+        const data = this._opts.decode(res)
+        if (!Array.isArray(data.cache)) {
+          const _cache = data.cache
+          data.cache = []
+          for (const key in _cache) {
+            data.cache.push([key, _cache[key]])
+          }
         }
-      }
-      this._cache = new Map(data.cache)
-      this._lastExpire = data.lastExpire
+        this._cache = new Map(data.cache)
+        this._lastExpire = data.lastExpire
+      }).catch((error: any) => console.error)
     } catch (e) {
       debug(e)
       this._cache = new Map()
@@ -157,7 +159,7 @@ export class KeyvFile<V = any> {
       lastExpire: this._lastExpire,
     })
     return new Promise<void>((resolve, reject) => {
-      this._ipfs.files.write(this._opts.filename, data).then((res:any) => {
+      this._ipfs.files.write(this._opts.filename, data).then((res: any) => {
         resolve();
       }).catch((err: Error) => reject(err));
       // fs.outputFile(this._opts.filename, data, err => {
