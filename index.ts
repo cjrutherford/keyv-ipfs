@@ -1,7 +1,5 @@
 'use strict';
 
-import * as os from 'os'
-import * as fs from 'fs-extra'
 import Debug from 'debug'
 import * as IPFS from 'ipfs';
 
