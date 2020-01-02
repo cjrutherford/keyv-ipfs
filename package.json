@@ -1,7 +1,7 @@
 {
   "name": "keyv-file",
   "version": "0.1.14",
-  "description": "File storage adapter for Keyv, using msgpack to serialize data fast and small.",
+  "description": "IPFS storage adapter for Keyv. Compatible with Cacheous",
   "main": "lib/index.js",
   "typings": "lib/index",
   "types": "./lib/index",
@@ -16,7 +16,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/zaaack/keyv-file.git"
+    "url": "git+https://github.com/cjrutherford/keyv-ipfs.git"
   },
   "keywords": [
     "keyv",
@@ -25,12 +25,12 @@
     "cache",
     "simple"
   ],
-  "author": "zaaack",
+  "author": "cjrutherford",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/zaaack/keyv-file/issues"
+    "url": "https://github.com/cjrutherford/keyv-ipfs/issues"
   },
-  "homepage": "https://github.com/zaaack/keyv-file#readme",
+  "homepage": "https://github.com/cjrutherford/keyv-ipfs#readme",
   "devDependencies": {
     "@types/debug": "^0.0.31",
     "@types/fs-extra": "^5.0.4",
